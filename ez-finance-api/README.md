@@ -107,6 +107,18 @@ The API runs at:
 http://localhost:5000/api
 ```
 
+Swagger UI is available at:
+
+```text
+http://localhost:5000/api-docs
+```
+
+The OpenAPI JSON document is available at:
+
+```text
+http://localhost:5000/api-docs.json
+```
+
 ## Production
 
 ```bash
