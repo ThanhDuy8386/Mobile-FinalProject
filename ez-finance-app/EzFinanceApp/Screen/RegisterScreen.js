@@ -1,15 +1,15 @@
-import {React, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, Pressable, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Pressable, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.container,
-      {
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom
-      }
+    {
+      paddingTop: insets.top,
+      paddingBottom: insets.bottom
+    }
     ]}>
       <View style={styles.form}>
         <Text style={styles.title}>Create account</Text>
