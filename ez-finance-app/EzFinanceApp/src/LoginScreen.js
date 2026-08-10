@@ -41,7 +41,8 @@ const LoginScreen = ({navigation}) => {
           <Text style={styles.forgot}>Forgot password?</Text>
         </Pressable>
 
-        <TouchableOpacity style={styles.loginButton}>
+        {/* will fix when connect to API */}
+        <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('MainTabs')}>
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
 
