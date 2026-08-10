@@ -13,6 +13,7 @@ import EditProfileScreen from './src/EditProfileScreen';
 import ChangePasswordScreen from './src/ChangePasswordScreen';
 import HomeScreen from './src/HomeScreen';
 import TransactionScreen from './src/TransactionScreen';
+import TransactionDetailScreen from './src/TransactionDetailScreen';
 
 const ProfileStack = createNativeStackNavigator();
 const ProfileStackNavigator = () => {
@@ -39,6 +40,24 @@ const ProfileStackNavigator = () => {
   );
 };
 
+const TransactionStack = createNativeStackNavigator();
+const TransactionNavigator = () => {
+  return (
+    <TransactionStack.Navigator>
+      <TransactionStack.Screen
+        name="Transaction"
+        component={TransactionScreen}
+        options={{ headerShown: false }}
+      />
+      <TransactionStack.Screen
+        name="TransactionDetail"
+        component={TransactionDetailScreen}
+        options={{ title: 'Transaction Detail' }}
+      />
+    </TransactionStack.Navigator>
+  );
+};
+
 const Tab = createBottomTabNavigator();
 const MainTabs = () => {
   return (
@@ -60,7 +79,7 @@ const MainTabs = () => {
       />
       <Tab.Screen
         name="Transaction"
-        component={TransactionScreen}
+        component={TransactionNavigator}
         options={{
           tabBarLabel: 'Transaction',
           tabBarIcon: ({ color, size }) => (
