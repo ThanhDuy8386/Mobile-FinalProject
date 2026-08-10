@@ -15,6 +15,9 @@ import HomeScreen from './src/HomeScreen';
 import TransactionScreen from './src/TransactionScreen';
 import TransactionDetailScreen from './src/TransactionDetailScreen';
 
+import HomeDashboardScreen from './src/HomeDashboardScreen';
+import MonthlyReportScreen from './src/MonthlyReportScreen';
+
 const ProfileStack = createNativeStackNavigator();
 const ProfileStackNavigator = () => {
   return (
@@ -58,6 +61,26 @@ const TransactionNavigator = () => {
   );
 };
 
+const HomeStack = createNativeStackNavigator();
+const HomeStackNavigator = () => {
+    return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen
+        name="HomeDashboard"
+        component={HomeDashboardScreen}
+        options={{
+          title: 'Home Dashboard',
+        }}
+      />
+      <HomeStack.Screen
+        name="MonthlyReport"
+        component={MonthlyReportScreen}
+        options={{ title: 'Monthly Report' }}
+      />
+    </HomeStack.Navigator>
+  );
+}
+
 const Tab = createBottomTabNavigator();
 const MainTabs = () => {
   return (
@@ -69,7 +92,7 @@ const MainTabs = () => {
       }}>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStackNavigator}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
