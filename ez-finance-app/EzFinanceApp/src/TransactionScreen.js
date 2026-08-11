@@ -13,9 +13,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const dummyTransactions = [
     {
         id: '1',
-        title: 'Salary',
+        title: 'August Salary',
         amount: 50000,
         type: 'INCOME',
+        category: 'Salary',
         date: '2026-08-05',
         note: 'Monthly salary',
     },
@@ -24,6 +25,7 @@ const dummyTransactions = [
         title: 'Lunch',
         amount: -50000,
         type: 'EXPENSE',
+        category: 'Food',
         date: '2026-08-10',
         note: 'Lunch with classmates',
     },
@@ -32,6 +34,7 @@ const dummyTransactions = [
         title: 'Freelance Project',
         amount: 150000,
         type: 'INCOME',
+        category: 'Job',
         date: '2026-08-07',
         note: 'Website development',
     },
@@ -113,7 +116,7 @@ const TransactionScreen = ({ navigation }) => {
                         }>
                         <View style={styles.cardTopRow}>
                             <Text style={styles.cardTitle}>{item.title}</Text>
-                            <Text style={styles.cardAmount}>
+                            <Text style={[styles.cardAmount, { color: item.amount < 0 ? '#E53935' : '#2E9E5B' }]}>
                                 {item.amount < 0 ? '-' : ''}
                                 {Math.abs(item.amount).toLocaleString()}.00
                             </Text>
@@ -126,7 +129,7 @@ const TransactionScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 )}
             />
-            <TouchableOpacity style={styles.fab}>
+            <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('AddTransaction')}>
                 <Ionicons name="add" size={28} color="#fff" />
             </TouchableOpacity>
         </SafeAreaView>
