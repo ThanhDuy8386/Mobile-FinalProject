@@ -30,7 +30,7 @@ const UserProfileScreen = ({ navigation }) => {
           <Ionicons name="chevron-forward" size={18} color="#ccc" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('BudgetListScreen')}>
           <Ionicons
             name="calendar-outline"
             size={20}

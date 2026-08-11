@@ -25,6 +25,11 @@ import CategoryListScreen from './src/CategoryListScreen';
 import AddCategoryScreen from './src/AddCategoryScreen';
 import EditCategoryScreen from './src/EditCategoryScreen';
 
+import BudgetListScreen from './src/BudgetListScreen';
+import AddBudgetScreen from './src/AddBudgetScreen';
+import BudgetDetailScreen from './src/BudgetDetailScreen';
+import EditBudgetScreen from './src/EditBudgetScreen';
+
 const ProfileStack = createNativeStackNavigator();
 const ProfileStackNavigator = () => {
   return (
@@ -63,6 +68,30 @@ const ProfileStackNavigator = () => {
         name="EditCategory"
         component={EditCategoryScreen}
         options={{ title: 'Edit Category' }}
+      />
+
+      <ProfileStack.Screen
+        name="BudgetListScreen"
+        component={BudgetListScreen}
+        options={{ title: 'Budget List' }}
+      />
+
+      <ProfileStack.Screen
+        name="BudgetDetailScreen"
+        component={BudgetDetailScreen}
+        options={{title: 'Budget Detail'}}
+      />
+
+      <ProfileStack.Screen
+        name="AddBudgetScreen"
+        component={AddBudgetScreen}
+        options={{title: 'Add Budget'}}
+      />
+
+      <ProfileStack.Screen
+        name="EditBudgetScreen"
+        component={EditBudgetScreen}
+        options={{title: 'Edit Budget'}}
       />
     </ProfileStack.Navigator>
   );
