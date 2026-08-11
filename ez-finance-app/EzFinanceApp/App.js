@@ -7,13 +7,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import LoginScreen from './src/LoginScreen';
-import RegisterScreen from './src/RegisterScreen'
+import RegisterScreen from './src/RegisterScreen';
+
 import UserProfileScreen from './src/UserProfileScreen';
 import EditProfileScreen from './src/EditProfileScreen';
 import ChangePasswordScreen from './src/ChangePasswordScreen';
-import HomeScreen from './src/HomeScreen';
+
 import TransactionScreen from './src/TransactionScreen';
 import TransactionDetailScreen from './src/TransactionDetailScreen';
+import AddTransactionScreen from './src/AddTransactionScreen';
+import EditTransactionScreen from './src/EditTransactionScreen';
 
 import HomeDashboardScreen from './src/HomeDashboardScreen';
 import MonthlyReportScreen from './src/MonthlyReportScreen';
@@ -45,9 +48,9 @@ const ProfileStackNavigator = () => {
       />
 
       <ProfileStack.Screen
-         name="CategoryList"
-         component={CategoryListScreen}
-         options={{ title: 'Category List' }}
+        name="CategoryList"
+        component={CategoryListScreen}
+        options={{ title: 'Category List' }}
       />
 
       <ProfileStack.Screen
@@ -70,7 +73,7 @@ const TransactionNavigator = () => {
   return (
     <TransactionStack.Navigator>
       <TransactionStack.Screen
-        name="Transaction"
+        name="TransactionList"
         component={TransactionScreen}
         options={{ headerShown: false }}
       />
@@ -79,13 +82,23 @@ const TransactionNavigator = () => {
         component={TransactionDetailScreen}
         options={{ title: 'Transaction Detail' }}
       />
+      <TransactionStack.Screen
+        name="AddTransaction"
+        component={AddTransactionScreen}
+        options={{ title: 'Add Transaction' }}
+      />
+      <TransactionStack.Screen
+        name="EditTransaction"
+        component={EditTransactionScreen}
+        options={{ title: 'Edit Transaction' }}
+      />
     </TransactionStack.Navigator>
   );
 };
 
 const HomeStack = createNativeStackNavigator();
 const HomeStackNavigator = () => {
-    return (
+  return (
     <HomeStack.Navigator>
       <HomeStack.Screen
         name="HomeDashboard"
