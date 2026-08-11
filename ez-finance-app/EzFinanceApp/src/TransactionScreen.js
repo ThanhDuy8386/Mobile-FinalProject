@@ -93,6 +93,9 @@ const TransactionScreen = ({ navigation }) => {
                         EXPENSE
                     </Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('TransactionFilter')} style={styles.filterButton}>
+                    <Ionicons name="options-outline" size={20} color="#333" />
+                </TouchableOpacity>
             </View>
 
             <View style={styles.searchBar}>
@@ -242,5 +245,15 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
+    },
+    filterButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#DDD',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FFF',
     },
 });

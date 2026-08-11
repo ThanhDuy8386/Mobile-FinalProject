@@ -27,7 +27,7 @@ const EditTransactionScreen = ({ route, navigation }) => {
     const [categoryOpen, setCategoryOpen] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
-    const handleDateChange = (pickedDate) => {
+    const handleDateChange = (event, pickedDate) => {
         setShowDatePicker(false);
         if (pickedDate) {
             setSelectedDate(pickedDate);
