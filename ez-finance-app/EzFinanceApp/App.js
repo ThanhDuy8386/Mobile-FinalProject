@@ -17,6 +17,7 @@ import TransactionScreen from './src/TransactionScreen';
 import TransactionDetailScreen from './src/TransactionDetailScreen';
 import AddTransactionScreen from './src/AddTransactionScreen';
 import EditTransactionScreen from './src/EditTransactionScreen';
+import TransactionFilterScreen from './src/TransactionFilterScreen';
 
 import HomeDashboardScreen from './src/HomeDashboardScreen';
 import MonthlyReportScreen from './src/MonthlyReportScreen';
@@ -79,19 +80,19 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen
         name="BudgetDetailScreen"
         component={BudgetDetailScreen}
-        options={{title: 'Budget Detail'}}
+        options={{ title: 'Budget Detail' }}
       />
 
       <ProfileStack.Screen
         name="AddBudgetScreen"
         component={AddBudgetScreen}
-        options={{title: 'Add Budget'}}
+        options={{ title: 'Add Budget' }}
       />
 
       <ProfileStack.Screen
         name="EditBudgetScreen"
         component={EditBudgetScreen}
-        options={{title: 'Edit Budget'}}
+        options={{ title: 'Edit Budget' }}
       />
     </ProfileStack.Navigator>
   );
@@ -120,6 +121,11 @@ const TransactionNavigator = () => {
         name="EditTransaction"
         component={EditTransactionScreen}
         options={{ title: 'Edit Transaction' }}
+      />
+      <TransactionStack.Screen
+        name="TransactionFilter"
+        component={TransactionFilterScreen}
+        options={{ title: 'Transaction Filter' }}
       />
     </TransactionStack.Navigator>
   );

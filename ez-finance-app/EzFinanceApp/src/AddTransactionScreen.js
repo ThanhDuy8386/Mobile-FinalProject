@@ -18,14 +18,14 @@ const AddTransactionScreen = ({ navigation }) => {
     const [type, setType] = useState('INCOME');
     const [category, setCategory] = useState('');
     const [date, setDate] = useState('');
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [note, setNote] = useState('');
 
     const [typeOpen, setTypeOpen] = useState(false);
     const [categoryOpen, setCategoryOpen] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
-    const handleDateChange = (pickedDate) => {
+    const handleDateChange = (event, pickedDate) => {
         setShowDatePicker(false);
         if (pickedDate) {
             setSelectedDate(pickedDate);
