@@ -19,7 +19,7 @@ const UserProfileScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.menuCard}>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('CategoryList')}>
           <Ionicons
             name="reader-outline"
             size={20}
