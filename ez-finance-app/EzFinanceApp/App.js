@@ -18,6 +18,10 @@ import TransactionDetailScreen from './src/TransactionDetailScreen';
 import HomeDashboardScreen from './src/HomeDashboardScreen';
 import MonthlyReportScreen from './src/MonthlyReportScreen';
 
+import CategoryListScreen from './src/CategoryListScreen';
+import AddCategoryScreen from './src/AddCategoryScreen';
+import EditCategoryScreen from './src/EditCategoryScreen';
+
 const ProfileStack = createNativeStackNavigator();
 const ProfileStackNavigator = () => {
   return (
@@ -38,6 +42,24 @@ const ProfileStackNavigator = () => {
         name="ChangePassword"
         component={ChangePasswordScreen}
         options={{ title: 'Change Password' }}
+      />
+
+      <ProfileStack.Screen
+         name="CategoryList"
+         component={CategoryListScreen}
+         options={{ title: 'Category List' }}
+      />
+
+      <ProfileStack.Screen
+        name="AddCategory"
+        component={AddCategoryScreen}
+        options={{ title: 'Add Category' }}
+      />
+
+      <ProfileStack.Screen
+        name="EditCategory"
+        component={EditCategoryScreen}
+        options={{ title: 'Edit Category' }}
       />
     </ProfileStack.Navigator>
   );
