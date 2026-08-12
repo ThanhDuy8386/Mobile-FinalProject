@@ -1,12 +1,116 @@
-import React, {useState} from 'react';
-import {View, TouchableOpacity, FlatList, Text, StyleSheet} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  FlatList,
+  Text,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CategoryListScreen = ({navigation}) => {
   const [selectedType, setSelectedType] = useState('INCOME');
+  const [categoryData, setCategoryData] = useState([]);
 
-  const getFilteredCategories = () => {
-    return categoryData.filter(
-      item => item.type === selectedType
+  const fetchCategories = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(
+        `http://10.0.2.2:5001/api/categories?type=${selectedType}`,
+        {
+          method: 'GET',
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Category response:', result);
+
+      if (result.success) {
+        setCategoryData(result.data);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+
+    } catch (error) {
+      console.log('Category error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load categories'
+      );
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [selectedType])
+  );
+
+  const handleDeleteCategory = (id) => {
+    Alert.alert(
+      'Delete Category',
+      'Are you sure you want to delete this category?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('token');
+
+              const response = await fetch(
+                `http://10.0.2.2:5001/api/categories/${id}`,
+                {
+                  method: 'DELETE',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              const result = await response.json();
+
+              console.log('Delete category response:', result);
+
+              if (result.success) {
+                Alert.alert(
+                  'Success',
+                  'Category deleted successfully'
+                );
+
+                fetchCategories();
+              } else {
+                Alert.alert(
+                  'Delete Failed',
+                  result.message
+                );
+              }
+
+            } catch (error) {
+              console.log('Delete category error:', error);
+
+              Alert.alert(
+                'Error',
+                'Cannot delete category'
+              );
+            }
+          },
+        },
+      ]
     );
   };
 
@@ -54,7 +158,9 @@ const CategoryListScreen = ({navigation}) => {
           <Text>✎</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton}
+          onPress={() => handleDeleteCategory(item.id)}
+        >
           <Text>🗑</Text>
         </TouchableOpacity>
 
@@ -103,7 +209,7 @@ const CategoryListScreen = ({navigation}) => {
 
       <View style={styles.listContainer}>
         <FlatList
-          data={getFilteredCategories()}
+          data={categoryData}
           renderItem={renderCategory}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
@@ -225,62 +331,3 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
 })
-
-const categoryData = [
-  {
-    id: 1,
-    name: 'Salary',
-    type: 'INCOME',
-    icon: 'cash',
-    color: '#22C55E',
-  },
-  {
-    id: 2,
-    name: 'Freelance',
-    type: 'INCOME',
-    icon: 'briefcase',
-    color: '#06B6D4',
-  },
-  {
-    id: 3,
-    name: 'Investment',
-    type: 'INCOME',
-    icon: 'trending-up',
-    color: '#8B5CF6',
-  },
-  {
-    id: 4,
-    name: 'Other Income',
-    type: 'INCOME',
-    icon: 'star',
-    color: '#F59E0B',
-  },
-  {
-    id: 5,
-    name: 'Food',
-    type: 'EXPENSE',
-    icon: 'restaurant',
-    color: '#EF4444',
-  },
-  {
-    id: 6,
-    name: 'Transport',
-    type: 'EXPENSE',
-    icon: 'car',
-    color: '#3B82F6',
-  },
-  {
-    id: 7,
-    name: 'Shopping',
-    type: 'EXPENSE',
-    icon: 'bag',
-    color: '#EC4899',
-  },
-  {
-    id: 8,
-    name: 'Entertainment',
-    type: 'EXPENSE',
-    icon: 'musical-notes',
-    color: '#7C3AED',
-  },
-];

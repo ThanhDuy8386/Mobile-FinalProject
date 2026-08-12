@@ -5,9 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 
-const AddCategoryScreen = () => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const AddCategoryScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [type, setType] = useState('INCOME');
   const [icon, setIcon] = useState('restaurant');
@@ -29,15 +32,69 @@ const AddCategoryScreen = () => {
     '#EF4444',
   ];
 
-  const handleAddCategory = () => {
-    const newCategory = {
-      name,
-      type,
-      icon,
-      color,
-    };
+  const handleAddCategory = async () => {
+    if (!name.trim()) {
+      Alert.alert(
+        'Warning',
+        'Please enter category name'
+      );
+      return;
+    }
 
-    console.log(newCategory);
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const newCategory = {
+        name,
+        type,
+        icon,
+        color,
+      };
+
+      console.log('New category:', newCategory);
+
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/categories',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newCategory),
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Create category response:', result);
+
+      if (result.success) {
+        Alert.alert(
+          'Success',
+          'Category created successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Create Failed',
+          result.message
+        );
+      }
+
+    } catch (error) {
+      console.log('Create category error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot create category'
+      );
+    }
   };
 
   return (

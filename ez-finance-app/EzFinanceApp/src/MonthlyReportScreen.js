@@ -1,47 +1,19 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
+  Alert
 } from 'react-native';
 
-const monthlyData = [
-  {
-    month: 1,
-    totalIncome: 1200000,
-    totalExpense: 800000,
-    balance: 400000,
-  },
-  {
-    month: 2,
-    totalIncome: 1500000,
-    totalExpense: 900000,
-    balance: 600000,
-  },
-  {
-    month: 3,
-    totalIncome: 1800000,
-    totalExpense: 1000000,
-    balance: 800000,
-  },
-  {
-    month: 8,
-    totalIncome: 15000000,
-    totalExpense: 4500000,
-    balance: 10500000,
-  },
-  {
-    month: 12,
-    totalIncome: 1800000,
-    totalExpense: 1100000,
-    balance: 700000,
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MonthlyReportScreen = () => {
+  const [monthlyData, setMonthlyData] = useState([]);
+
   const formatMoney = (amount) => {
-    return amount.toFixed(2);
+    return Number(amount).toFixed(2);
   };
 
   const renderMonth = ({ item }) => {
@@ -89,6 +61,44 @@ const MonthlyReportScreen = () => {
       </View>
     );
   };
+
+  const fetchMonthlyReport = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/reports/monthly?year=2026',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Monthly report response:', result);
+
+      if (result.success) {
+        setMonthlyData(result.data);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+
+    } catch (error) {
+      console.log('Monthly report error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load monthly report'
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchMonthlyReport();
+  }, []);
 
   return (
     <View style={styles.container}>

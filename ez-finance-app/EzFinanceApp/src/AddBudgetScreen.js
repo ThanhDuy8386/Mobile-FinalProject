@@ -1,30 +1,154 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 
-const AddBudgetScreen = () => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const AddBudgetScreen = ({ navigation }) => {
   const [categoryId, setCategoryId] = useState(null);
   const [limitAmount, setLimitAmount] = useState('');
   const [month, setMonth] = useState('8');
   const [year, setYear] = useState('2026');
+  const [expenseCategories, setExpenseCategories] = useState([]);
 
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
-  const handleAddBudget = () => {
-    const newBudget = {
-      categoryId: categoryId,
-      limitAmount: Number(limitAmount),
-      month: Number(month),
-      year: Number(year),
-    };
+  const fetchExpenseCategories = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
 
-    console.log(newBudget);
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/categories?type=EXPENSE',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Expense categories:', result);
+
+      if (result.success) {
+        setExpenseCategories(result.data);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+
+    } catch (error) {
+      console.log('Category error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load expense categories'
+      );
+    }
   };
+
+  const handleAddBudget = async () => {
+    if (!categoryId) {
+      Alert.alert(
+        'Warning',
+        'Please select category'
+      );
+      return;
+    }
+
+    if (!limitAmount || Number(limitAmount) <= 0) {
+      Alert.alert(
+        'Warning',
+        'Please enter valid limit amount'
+      );
+      return;
+    }
+
+    if (
+      !month ||
+      Number(month) < 1 ||
+      Number(month) > 12
+    ) {
+      Alert.alert(
+        'Warning',
+        'Month must be between 1 and 12'
+      );
+      return;
+    }
+
+    if (!year) {
+      Alert.alert(
+        'Warning',
+        'Please enter year'
+      );
+      return;
+    }
+
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const newBudget = {
+        categoryId: categoryId,
+        limitAmount: Number(limitAmount),
+        month: Number(month),
+        year: Number(year),
+      };
+
+      console.log('New budget:', newBudget);
+
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/budgets',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newBudget),
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Create budget response:', result);
+
+      if (result.success) {
+        Alert.alert(
+          'Success',
+          'Budget created successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Create Failed',
+          result.message
+        );
+      }
+
+    } catch (error) {
+      console.log('Create budget error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot create budget'
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchExpenseCategories();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -105,25 +229,6 @@ const AddBudgetScreen = () => {
     </View>
   );
 };
-
-const expenseCategories = [
-  {
-    id: 1,
-    name: 'Food',
-  },
-  {
-    id: 5,
-    name: 'Transport',
-  },
-  {
-    id: 7,
-    name: 'Shopping',
-  },
-  {
-    id: 8,
-    name: 'Entertainment',
-  },
-];
 
 const styles = StyleSheet.create({
   container: {
