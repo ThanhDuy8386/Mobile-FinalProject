@@ -1,27 +1,69 @@
-import React from 'react';
+import React, {
+  useCallback,
+  useState,
+} from 'react';
+
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
-  TouchableOpacity
+  FlatList,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BudgetDetailScreen = ({ route, navigation }) => {
   const { budget } = route.params;
-  const renderInfoRow = (label, value, isRed = false) => {
+  const [budgetDetail, setBudgetDetail] = useState(null);
+  const fetchBudgetDetail = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(
+        `http://10.0.2.2:5001/api/budgets/${budget.id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Budget detail response:', result);
+
+      if (result.success) {
+        setBudgetDetail(result.data);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+
+    } catch (error) {
+      console.log('Budget detail error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load budget detail'
+      );
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchBudgetDetail();
+    }, [])
+  );
+  const renderInfoRow = (label, value) => {
     return (
       <View style={styles.infoRow}>
         <Text style={styles.label}>
           {label}
         </Text>
 
-        <Text
-          style={[
-            styles.value,
-            isRed && styles.redText,
-          ]}
-        >
+        <Text style={styles.value}>
           {value}
         </Text>
       </View>
@@ -32,16 +74,18 @@ const BudgetDetailScreen = ({ route, navigation }) => {
     return (
       <View style={styles.transactionRow}>
 
-        <Text style={styles.transactionTitle}>
-          {item.title}
-        </Text>
+        <View>
+          <Text style={styles.transactionTitle}>
+            {item.title}
+          </Text>
+
+          <Text style={styles.transactionDate}>
+            {item.transactionDate}
+          </Text>
+        </View>
 
         <Text style={styles.transactionAmount}>
           {formatMoney(item.amount)}
-        </Text>
-
-        <Text style={styles.transactionDate}>
-          {item.transactionDate}
         </Text>
 
       </View>
@@ -49,8 +93,16 @@ const BudgetDetailScreen = ({ route, navigation }) => {
   };
 
   const formatMoney = (amount) => {
-    return amount.toFixed(2);
+    return Number(amount).toFixed(2);
   };
+
+  if (!budgetDetail) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
