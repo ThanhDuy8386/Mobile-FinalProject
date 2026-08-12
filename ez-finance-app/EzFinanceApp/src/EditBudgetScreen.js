@@ -153,7 +153,7 @@ const EditBudgetScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
 
-      <Text style={styles.label}>categoryId</Text>
+      <Text style={styles.label}>Category</Text>
 
       <TouchableOpacity
         style={styles.dropdownButton}
@@ -192,7 +192,7 @@ const EditBudgetScreen = ({ route, navigation }) => {
       )}
 
 
-      <Text style={styles.label}>limitAmount</Text>
+      <Text style={styles.label}>Limit Amount</Text>
 
       <TextInput
         style={styles.input}
@@ -202,7 +202,7 @@ const EditBudgetScreen = ({ route, navigation }) => {
       />
 
 
-      <Text style={styles.label}>month</Text>
+      <Text style={styles.label}>Month</Text>
 
       <TextInput
         style={styles.input}
@@ -212,7 +212,7 @@ const EditBudgetScreen = ({ route, navigation }) => {
       />
 
 
-      <Text style={styles.label}>year</Text>
+      <Text style={styles.label}>Year</Text>
 
       <TextInput
         style={styles.input}
