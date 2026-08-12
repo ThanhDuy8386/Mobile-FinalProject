@@ -8,6 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import LoginScreen from './src/LoginScreen';
 import RegisterScreen from './src/RegisterScreen';
+import ForgotPasswordScreen from './src/ForgotPasswordScreen';
 
 import UserProfileScreen from './src/UserProfileScreen';
 import EditProfileScreen from './src/EditProfileScreen';
@@ -149,7 +150,7 @@ const HomeStackNavigator = () => {
       />
     </HomeStack.Navigator>
   );
-}
+};
 
 const Tab = createBottomTabNavigator();
 const MainTabs = () => {
@@ -159,7 +160,8 @@ const MainTabs = () => {
         headerShown: false,
         tabBarActiveTintColor: '#1569FF',
         tabBarInactiveTintColor: '#888',
-      }}>
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomeStackNavigator}
@@ -213,6 +215,11 @@ export default function App() {
           <Stack.Screen
             name="MainTabs"
             component={MainTabs}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>

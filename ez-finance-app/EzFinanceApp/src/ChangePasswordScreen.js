@@ -22,17 +22,26 @@ const ChangePasswordScreen = ({ navigation }) => {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
-      Alert.alert('Missing password', 'Enter both your current and new password.');
+      Alert.alert(
+        'Missing password',
+        'Enter both your current and new password.',
+      );
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('Invalid password', 'New password must be at least 6 characters.');
+      Alert.alert(
+        'Invalid password',
+        'New password must be at least 6 characters.',
+      );
       return;
     }
 
     if (currentPassword === newPassword) {
-      Alert.alert('Invalid password', 'New password must differ from current password.');
+      Alert.alert(
+        'Invalid password',
+        'New password must differ from current password.',
+      );
       return;
     }
 
@@ -76,7 +85,8 @@ const ChangePasswordScreen = ({ navigation }) => {
             style={styles.input}
           />
           <TouchableOpacity
-            onPress={() => setShowCurrentPassword(!showCurrentPassword)}>
+            onPress={() => setShowCurrentPassword(!showCurrentPassword)}
+          >
             <Ionicons
               name={showCurrentPassword ? 'eye-off' : 'eye'}
               size={22}
@@ -94,7 +104,8 @@ const ChangePasswordScreen = ({ navigation }) => {
             style={styles.input}
           />
           <TouchableOpacity
-            onPress={() => setShowNewPassword(!showNewPassword)}>
+            onPress={() => setShowNewPassword(!showNewPassword)}
+          >
             <Ionicons
               name={showNewPassword ? 'eye-off' : 'eye'}
               size={22}
@@ -102,8 +113,16 @@ const ChangePasswordScreen = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.updateButton} onPress={handleChangePassword} disabled={updating}>
-          {updating ? <ActivityIndicator color="#fff" /> : <Text style={styles.updateText}>Update</Text>}
+        <TouchableOpacity
+          style={styles.updateButton}
+          onPress={handleChangePassword}
+          disabled={updating}
+        >
+          {updating ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.updateText}>Update</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

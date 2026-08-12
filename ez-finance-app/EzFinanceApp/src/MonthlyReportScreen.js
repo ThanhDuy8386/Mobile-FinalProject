@@ -20,7 +20,7 @@ const MonthlyReportScreen = () => {
     return (
       <View style={styles.monthCard}>
         <View style={styles.monthBox}>
-          <Text style={styles.monthLabel}>month</Text>
+          <Text style={styles.monthLabel}>Month</Text>
 
           <Text style={styles.monthNumber}>
             {item.month}
@@ -30,7 +30,7 @@ const MonthlyReportScreen = () => {
         <View style={styles.reportInfo}>
           <View style={styles.reportRow}>
             <Text style={styles.reportLabel}>
-              totalIncome
+              Total Income
             </Text>
 
             <Text style={styles.reportValue}>
@@ -40,7 +40,7 @@ const MonthlyReportScreen = () => {
 
           <View style={styles.reportRow}>
             <Text style={styles.reportLabel}>
-              totalExpense
+              Total Expense
             </Text>
 
             <Text style={styles.reportValue}>
@@ -50,7 +50,7 @@ const MonthlyReportScreen = () => {
 
           <View style={styles.reportRow}>
             <Text style={styles.reportLabel}>
-              balance
+              Balance
             </Text>
 
             <Text style={styles.reportValue}>

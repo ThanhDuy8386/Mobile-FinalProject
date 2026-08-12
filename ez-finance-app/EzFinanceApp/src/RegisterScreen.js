@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
-import { Alert, ActivityIndicator, View, Text, StyleSheet, TextInput, Pressable, TouchableOpacity } from 'react-native';
+import {
+  Alert,
+  ActivityIndicator,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -15,7 +24,10 @@ const RegisterScreen = ({ navigation }) => {
     const trimmedEmail = email.trim();
 
     if (trimmedName.length < 2 || trimmedName.length > 100) {
-      Alert.alert('Invalid name', 'Full name must be between 2 and 100 characters.');
+      Alert.alert(
+        'Invalid name',
+        'Full name must be between 2 and 100 characters.',
+      );
       return;
     }
 
@@ -25,7 +37,10 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     if (password.length < 6) {
-      Alert.alert('Invalid password', 'Password must be at least 6 characters.');
+      Alert.alert(
+        'Invalid password',
+        'Password must be at least 6 characters.',
+      );
       return;
     }
 
@@ -53,18 +68,24 @@ const RegisterScreen = ({ navigation }) => {
       await AsyncStorage.setItem('token', result.data.token);
       navigation.replace('MainTabs');
     } catch (error) {
-      Alert.alert('Registration failed', error.message || 'Cannot connect to server');
+      Alert.alert(
+        'Registration failed',
+        error.message || 'Cannot connect to server',
+      );
     } finally {
       setLoading(false);
     }
   };
   return (
-    <View style={[styles.container,
-    {
-      paddingTop: insets.top,
-      paddingBottom: insets.bottom
-    }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
       <View style={styles.form}>
         <Text style={styles.title}>Create account</Text>
         <Text style={styles.subtitle}>Sign up to get started</Text>
@@ -92,37 +113,56 @@ const RegisterScreen = ({ navigation }) => {
       </View>
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <Pressable onPress={() => setShowPassword(!showPassword)}>
-          <Text style={styles.eye}>{showPassword ? 'Hide' : 'Show'}</Text>
-        </Pressable>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, styles.passwordInput]}
+            placeholder="Enter your password"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? 'eye-off' : 'eye'}
+              size={22}
+              color="#888"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity style={styles.loginButton} onPress={handleRegister} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginText}>Register</Text>}
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={handleRegister}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.loginText}>Register</Text>
+        )}
       </TouchableOpacity>
 
       <View style={styles.registerRow}>
-        <Text style={styles.registerText}>Already have an account?  </Text>
+        <Text style={styles.registerText}>Already have an account? </Text>
 
         <TouchableOpacity>
-          <Text style={styles.registerLink} onPress={() => navigation.navigate('Login')}>Login</Text>
+          <Text
+            style={styles.registerLink}
+            onPress={() => navigation.navigate('Login')}
+          >
+            Login
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   form: {
     marginTop: 70,
@@ -130,30 +170,42 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   inputGroup: {
-    marginTop: 10
+    marginTop: 10,
   },
   label: {
     fontWeight: 'bold',
     fontSize: 20,
-    marginBottom: 5
+    marginBottom: 5,
   },
   input: {
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
-    height: 46
+    height: 46,
   },
-  eye: {
-    color: 'gray',
-    fontSize: 12,
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+  },
+  passwordInput: {
+    flex: 1,
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 14,
+    height: 50,
   },
 
   forgot: {
@@ -191,5 +243,5 @@ const styles = StyleSheet.create({
     color: '#4f6df5',
     fontWeight: 'bold',
   },
-})
+});
 export default RegisterScreen;
