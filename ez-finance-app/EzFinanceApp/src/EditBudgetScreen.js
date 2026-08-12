@@ -1,35 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 
-const expenseCategories = [
-  {
-    id: 1,
-    name: 'Food',
-  },
-  {
-    id: 5,
-    name: 'Transport',
-  },
-  {
-    id: 7,
-    name: 'Shopping',
-  },
-  {
-    id: 8,
-    name: 'Entertainment',
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditBudgetScreen = ({ route, navigation }) => {
   const { budget } = route.params;
 
-  const [categoryId, setCategoryId] = useState(budget.categoryId);
+  const [expenseCategories, setExpenseCategories] = useState([]);
+  const [categoryId, setCategoryId] = useState(
+    budget.category.id
+  );
   const [limitAmount, setLimitAmount] = useState(
     budget.limitAmount.toString()
   );
@@ -43,17 +30,124 @@ const EditBudgetScreen = ({ route, navigation }) => {
   const [showCategoryDropdown, setShowCategoryDropdown] =
     useState(false);
 
-  const handleEditBudget = () => {
-    const updatedBudget = {
-      categoryId,
-      limitAmount: Number(limitAmount),
-      month: Number(month),
-      year: Number(year),
-    };
+  const fetchExpenseCategories = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
 
-    console.log(updatedBudget);
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/categories?type=EXPENSE',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    navigation.goBack();
+      const result = await response.json();
+
+      if (result.success) {
+        setExpenseCategories(result.data);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+
+    } catch (error) {
+      console.log('Category error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load expense categories'
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchExpenseCategories();
+  }, []);
+
+  const handleEditBudget = async () => {
+    if (!categoryId) {
+      Alert.alert(
+        'Warning',
+        'Please select category'
+      );
+      return;
+    }
+
+    if (!limitAmount || Number(limitAmount) <= 0) {
+      Alert.alert(
+        'Warning',
+        'Please enter valid limit amount'
+      );
+      return;
+    }
+
+    if (
+      Number(month) < 1 ||
+      Number(month) > 12
+    ) {
+      Alert.alert(
+        'Warning',
+        'Month must be between 1 and 12'
+      );
+      return;
+    }
+
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const updatedBudget = {
+        categoryId,
+        limitAmount: Number(limitAmount),
+        month: Number(month),
+        year: Number(year),
+      };
+
+      console.log('Updated budget:', updatedBudget);
+
+      const response = await fetch(
+        `http://10.0.2.2:5001/api/budgets/${budget.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedBudget),
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Update budget response:', result);
+
+      if (result.success) {
+        Alert.alert(
+          'Success',
+          'Budget updated successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Update Failed',
+          result.message
+        );
+      }
+
+    } catch (error) {
+      console.log('Update budget error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot update budget'
+      );
+    }
   };
 
   return (

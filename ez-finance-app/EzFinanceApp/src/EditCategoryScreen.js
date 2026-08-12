@@ -5,7 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iconOptions = [
   'restaurant',
@@ -21,7 +24,7 @@ const colorOptions = [
   '#EF4444',
 ];
 
-const EditCategoryScreen = ({ route }) => {
+const EditCategoryScreen = ({ route, navigation }) => {
   const { category } = route.params;
 
   const [name, setName] = useState(category.name);
@@ -32,15 +35,69 @@ const EditCategoryScreen = ({ route }) => {
   const [showIconDropdown, setShowIconDropdown] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
 
-  const handleEditCategory = () => {
-    const updatedCategory = {
-      name,
-      type,
-      icon,
-      color,
-    };
+  const handleEditCategory = async () => {
+    if (!name.trim()) {
+      Alert.alert(
+        'Warning',
+        'Please enter category name'
+      );
+      return;
+    }
 
-    console.log(updatedCategory);
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const updatedCategory = {
+        name,
+        type,
+        icon,
+        color,
+      };
+
+      console.log('Updated category:', updatedCategory);
+
+      const response = await fetch(
+        `http://10.0.2.2:5001/api/categories/${category.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedCategory),
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Update category response:', result);
+
+      if (result.success) {
+        Alert.alert(
+          'Success',
+          'Category updated successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          'Update Failed',
+          result.message
+        );
+      }
+
+    } catch (error) {
+      console.log('Update category error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot update category'
+      );
+    }
   };
 
   return (

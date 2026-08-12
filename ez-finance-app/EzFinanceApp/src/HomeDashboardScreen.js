@@ -1,60 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  ScrollView
 } from 'react-native';
-
-
-const dashboardData = {
-  totalIncome: 15000000,
-  totalExpense: 4500000,
-  balance: 10500000,
-  allTimeBalance: 25000000,
-
-  recentTransactions: [
-    {
-      id: 1,
-      title: 'Salary',
-      amount: 50000,
-      type: 'INCOME',
-      transactionDate: '2026-08-05',
-    },
-    {
-      id: 2,
-      title: 'Food',
-      amount: 2500,
-      type: 'EXPENSE',
-      transactionDate: '2026-08-06',
-    },
-  ],
-
-  budgetSummary: [
-    {
-      categoryId: 1,
-      limitAmount: 3000000,
-      spentAmount: 1200000,
-      remainingAmount: 1800000,
-      percentage: 40,
-      isExceeded: false,
-    },
-    {
-      categoryId: 5,
-      limitAmount: 150000,
-      spentAmount: 160000,
-      remainingAmount: -10000,
-      percentage: 107,
-      isExceeded: true,
-    },
-  ],
-};
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeDashboardScreen = ({ navigation }) => {
+  const [dashboardData, setDashboardData] = useState(null);
+
+  const fetchDashboard = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/reports/dashboard',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Dashboard response:', result);
+
+      if (result.success) {
+        setDashboardData(result.data);
+      } else {
+        Alert.alert('Error', result.message);
+      }
+
+    } catch (error) {
+      console.log('Dashboard error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load dashboard data'
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
   // Format tiền
   const formatMoney = (amount) => {
-    return amount.toFixed(2);
+    return Number(amount).toFixed(2);
   };
 
 
@@ -113,7 +110,7 @@ const HomeDashboardScreen = ({ navigation }) => {
       <View style={styles.budgetRow}>
 
         <Text style={styles.budgetCell}>
-          {item.categoryId}
+          {item.category.name}
         </Text>
 
         <Text style={styles.budgetCell}>
@@ -140,6 +137,14 @@ const HomeDashboardScreen = ({ navigation }) => {
       </View>
     );
   };
+
+  if (!dashboardData) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -201,7 +206,7 @@ const HomeDashboardScreen = ({ navigation }) => {
         </Text>
 
         <View style={styles.budgetHeader}>
-          <Text style={styles.budgetHeaderCell}>categoryId</Text>
+          <Text style={styles.budgetHeaderCell}>category</Text>
           <Text style={styles.budgetHeaderCell}>limitAmount</Text>
           <Text style={styles.budgetHeaderCell}>spentAmount</Text>
           <Text style={styles.budgetHeaderCell}>remainingAmount</Text>
@@ -209,7 +214,7 @@ const HomeDashboardScreen = ({ navigation }) => {
         </View>
 
         {dashboardData.budgetSummary.map(item => (
-          <View key={item.categoryId}>
+          <View key={item.id}>
             {renderBudget(item)}
           </View>
         ))}

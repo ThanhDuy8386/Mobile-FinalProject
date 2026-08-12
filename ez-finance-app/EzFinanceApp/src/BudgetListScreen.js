@@ -1,10 +1,59 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const BudgetListScreen = ({navigation}) => {
+  const [budgetData, setBudgetData] = useState([]);
   const formatMoney = (amount) => {
-    return amount.toFixed(2);
+    return Number(amount).toFixed(2);
   };
+  const fetchBudgets = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(
+        'http://10.0.2.2:5001/api/budgets',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      console.log('Budget response:', result);
+
+      if (result.success) {
+        setBudgetData(result.data);
+      } else {
+        Alert.alert(
+          'Error',
+          result.message
+        );
+      }
+
+    } catch (error) {
+      console.log('Budget error:', error);
+
+      Alert.alert(
+        'Error',
+        'Cannot load budgets'
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchBudgets();
+  }, []);
 
   const renderBudget = ({ item }) => {
     return (
@@ -19,7 +68,7 @@ const BudgetListScreen = ({navigation}) => {
 
         <View style={styles.topRow}>
           <Text style={styles.categoryText}>
-            categoryId: {item.categoryId}
+            {item.category.name}
           </Text>
 
           <Text style={styles.monthText}>
@@ -216,39 +265,3 @@ const styles = StyleSheet.create({
 });
 
 export default BudgetListScreen;
-
-const budgetData = [
-  {
-    id: 1,
-    categoryId: 1,
-    limitAmount: 3000000,
-    spentAmount: 1200000,
-    remainingAmount: 1800000,
-    percentage: 40,
-    isExceeded: false,
-    month: 8,
-    year: 2026,
-  },
-  {
-    id: 2,
-    categoryId: 5,
-    limitAmount: 1500000,
-    spentAmount: 1600000,
-    remainingAmount: -100000,
-    percentage: 107,
-    isExceeded: true,
-    month: 8,
-    year: 2026,
-  },
-  {
-    id: 3,
-    categoryId: 7,
-    limitAmount: 2000000,
-    spentAmount: 800000,
-    remainingAmount: 1200000,
-    percentage: 40,
-    isExceeded: false,
-    month: 8,
-    year: 2026,
-  },
-];
