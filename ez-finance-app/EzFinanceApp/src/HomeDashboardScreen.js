@@ -104,7 +104,7 @@ const HomeDashboardScreen = ({ navigation }) => {
     );
   };
 
-//render budget
+  //render budget
   const renderBudget = (item) => {
     return (
       <View style={styles.budgetRow}>
@@ -151,29 +151,29 @@ const HomeDashboardScreen = ({ navigation }) => {
       <View style={styles.summaryContainer}>
 
         {renderSummaryCard(
-          'totalIncome',
+          'Total Income',
           dashboardData.totalIncome
         )}
 
         {renderSummaryCard(
-          'totalExpense',
+          'Total Expense',
           dashboardData.totalExpense
         )}
 
         {renderSummaryCard(
-          'balance',
+          'Balance',
           dashboardData.balance
         )}
 
         {renderSummaryCard(
-          'allTimeBalance',
+          'All Time Balance',
           dashboardData.allTimeBalance
         )}
 
       </View>
 
       <TouchableOpacity style={styles.reportButton}
-      onPress={() => navigation.navigate('MonthlyReport')}>
+        onPress={() => navigation.navigate('MonthlyReport')}>
         <Text style={styles.reportButtonText}>
           View Monthly Report
         </Text>
@@ -182,42 +182,43 @@ const HomeDashboardScreen = ({ navigation }) => {
       <View style={styles.transactionContainer}>
 
         <Text style={styles.sectionTitle}>
-          recentTransactions
+          Recent Transactions
         </Text>
 
-        {dashboardData.recentTransactions.map(item => (
+        {dashboardData.recentTransactions.slice(0, 5).map(item => (
           <View key={item.id}>
             {renderTransaction(item)}
           </View>
         ))}
-
-        <TouchableOpacity>
-          <Text style={styles.viewAll}>
-            View All
-          </Text>
-        </TouchableOpacity>
 
       </View>
 
       <View style={styles.budgetContainer}>
 
         <Text style={styles.sectionTitle}>
-          budgetSummary
+          Budget Summary
         </Text>
 
         <View style={styles.budgetHeader}>
-          <Text style={styles.budgetHeaderCell}>category</Text>
-          <Text style={styles.budgetHeaderCell}>limitAmount</Text>
-          <Text style={styles.budgetHeaderCell}>spentAmount</Text>
-          <Text style={styles.budgetHeaderCell}>remainingAmount</Text>
-          <Text style={styles.budgetHeaderCell}>percentage</Text>
+          <Text style={styles.budgetHeaderCell}>Category</Text>
+          <Text style={styles.budgetHeaderCell}>Limit</Text>
+          <Text style={styles.budgetHeaderCell}>Spent</Text>
+          <Text style={styles.budgetHeaderCell}>Remaining</Text>
+          <Text style={styles.budgetHeaderCell}>Percentage</Text>
         </View>
 
-        {dashboardData.budgetSummary.map(item => (
-          <View key={item.id}>
-            {renderBudget(item)}
-          </View>
-        ))}
+        <ScrollView
+          style={styles.budgetList}
+          contentContainerStyle={styles.budgetListContent}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled
+        >
+          {dashboardData.budgetSummary.map(item => (
+            <View key={item.id}>
+              {renderBudget(item)}
+            </View>
+          ))}
+        </ScrollView>
 
       </View>
     </View>
@@ -261,12 +262,12 @@ const styles = StyleSheet.create({
   },
 
   transactionContainer: {
-  borderWidth: 1,
-  borderColor: '#ddd',
-  borderRadius: 10,
-  padding: 14,
-  marginTop: 12,
-},
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 14,
+    marginTop: 12,
+  },
 
   sectionTitle: {
     fontSize: 14,
@@ -310,21 +311,15 @@ const styles = StyleSheet.create({
     color: 'red',
   },
 
-  viewAll: {
-    color: '#3578e5',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginTop: 4,
-  },
-
   budgetContainer: {
-  borderWidth: 1,
-  borderColor: '#ddd',
-  borderRadius: 10,
-  padding: 14,
-  marginTop: 16,
-  marginBottom: 20,
-},
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 14,
+    marginTop: 16,
+    marginBottom: 90,
+  },
 
   budgetHeader: {
     flexDirection: 'row',
@@ -336,6 +331,14 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+
+  budgetList: {
+    flex: 1,
+  },
+
+  budgetListContent: {
+    paddingBottom: 16,
   },
 
   budgetRow: {

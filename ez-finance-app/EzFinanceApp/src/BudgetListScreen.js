@@ -9,17 +9,24 @@ import {
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const BudgetListScreen = ({navigation}) => {
+const BudgetListScreen = ({ navigation }) => {
+  const currentDate = new Date();
   const [budgetData, setBudgetData] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+
+  const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
   const formatMoney = (amount) => {
     return Number(amount).toFixed(2);
   };
-  const fetchBudgets = async () => {
+
+  const fetchBudgets = async (month, year) => {
     try {
       const token = await AsyncStorage.getItem('token');
 
       const response = await fetch(
-        'http://10.0.2.2:5001/api/budgets',
+        `http://10.0.2.2:5001/api/budgets?month=${month}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -52,18 +59,26 @@ const BudgetListScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    fetchBudgets();
-  }, []);
+    fetchBudgets(selectedMonth, selectedYear);
+  }, [selectedMonth, selectedYear]);
+
+  const goToPreviousYear = () => {
+    setSelectedYear(selectedYear - 1);
+  };
+
+  const goToNextYear = () => {
+    setSelectedYear(selectedYear + 1);
+  };
 
   const renderBudget = ({ item }) => {
     return (
       <TouchableOpacity
         style={styles.budgetCard}
         onPress={() =>
-            navigation.navigate('BudgetDetailScreen', {
-              budget: item,
-            })
-          }
+          navigation.navigate('BudgetDetailScreen', {
+            budget: item,
+          })
+        }
       >
 
         <View style={styles.topRow}>
@@ -72,13 +87,13 @@ const BudgetListScreen = ({navigation}) => {
           </Text>
 
           <Text style={styles.monthText}>
-            month: {item.month} year: {item.year}
+            Month: {item.month} Year: {item.year}
           </Text>
         </View>
 
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>limitAmount</Text>
+          <Text style={styles.label}>Limit Amount</Text>
 
           <Text style={styles.value}>
             {formatMoney(item.limitAmount)}
@@ -87,7 +102,7 @@ const BudgetListScreen = ({navigation}) => {
 
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>spentAmount</Text>
+          <Text style={styles.label}>Spent Amount</Text>
 
           <Text style={styles.value}>
             {formatMoney(item.spentAmount)}
@@ -96,7 +111,7 @@ const BudgetListScreen = ({navigation}) => {
 
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>remainingAmount</Text>
+          <Text style={styles.label}>Remaining Amount</Text>
 
           <Text
             style={[
@@ -110,7 +125,7 @@ const BudgetListScreen = ({navigation}) => {
 
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>percentage</Text>
+          <Text style={styles.label}>Percentage</Text>
 
           <Text
             style={[
@@ -126,7 +141,7 @@ const BudgetListScreen = ({navigation}) => {
 
 
         <View style={styles.infoRow}>
-          <Text style={styles.label}>isExceeded</Text>
+          <Text style={styles.label}>Is Exceeded</Text>
 
           <Text
             style={[
@@ -160,6 +175,50 @@ const BudgetListScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
 
+      <View style={styles.filterContainer}>
+        <View style={styles.yearRow}>
+          <TouchableOpacity
+            style={styles.yearButton}
+            onPress={goToPreviousYear}
+          >
+            <Text style={styles.yearButtonText}>{'<'}</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.filterTitle}>
+            Month {selectedMonth} / {selectedYear}
+          </Text>
+
+          <TouchableOpacity
+            style={styles.yearButton}
+            onPress={goToNextYear}
+          >
+            <Text style={styles.yearButtonText}>{'>'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.monthList}>
+          {months.map((month) => (
+            <TouchableOpacity
+              key={month}
+              style={[
+                styles.monthButton,
+                selectedMonth === month && styles.selectedMonthButton,
+              ]}
+              onPress={() => setSelectedMonth(month)}
+            >
+              <Text
+                style={[
+                  styles.monthButtonText,
+                  selectedMonth === month && styles.selectedMonthButtonText,
+                ]}
+              >
+                {month}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
       <FlatList
         data={budgetData}
         renderItem={renderBudget}
@@ -180,6 +239,66 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingHorizontal: 16,
     paddingTop: 16,
+  },
+
+  filterContainer: {
+    marginBottom: 12,
+  },
+
+  yearRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+
+  yearButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F1F4F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  yearButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1569FF',
+  },
+
+  filterTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  monthList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+
+  monthButton: {
+    width: 38,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F1F4F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  selectedMonthButton: {
+    backgroundColor: '#1569FF',
+  },
+
+  monthButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+
+  selectedMonthButtonText: {
+    color: 'white',
   },
 
   budgetCard: {

@@ -152,7 +152,7 @@ const AddBudgetScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>categoryId</Text>
+      <Text style={styles.label}>Category</Text>
 
       <TouchableOpacity
         style={styles.dropdownButton}
@@ -163,8 +163,8 @@ const AddBudgetScreen = ({ navigation }) => {
         <Text>
           {categoryId
             ? expenseCategories.find(
-                item => item.id === categoryId
-              )?.name
+              item => item.id === categoryId
+            )?.name
             : 'Select category'}
         </Text>
 
@@ -190,7 +190,7 @@ const AddBudgetScreen = ({ navigation }) => {
         </View>
       )}
 
-      <Text style={styles.label}>limitAmount</Text>
+      <Text style={styles.label}>Limit Amount</Text>
 
       <TextInput
         style={styles.input}
@@ -200,7 +200,7 @@ const AddBudgetScreen = ({ navigation }) => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>month</Text>
+      <Text style={styles.label}>Month</Text>
 
       <TextInput
         style={styles.input}
@@ -209,7 +209,7 @@ const AddBudgetScreen = ({ navigation }) => {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>year</Text>
+      <Text style={styles.label}>Year</Text>
 
       <TextInput
         style={styles.input}
