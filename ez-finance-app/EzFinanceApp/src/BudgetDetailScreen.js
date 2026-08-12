@@ -118,58 +118,53 @@ const BudgetDetailScreen = ({ route, navigation }) => {
             <View style={styles.detailCard}>
 
               {renderInfoRow(
-                'categoryId',
-                budgetDetail.categoryId
-              )}
-
-              {renderInfoRow(
-                'limitAmount',
+                'Limit Amount',
                 formatMoney(budgetDetail.limitAmount)
               )}
 
               {renderInfoRow(
-                'spentAmount',
+                'Spent Amount',
                 formatMoney(budgetDetail.spentAmount)
               )}
 
               {renderInfoRow(
-                'remainingAmount',
+                'Remaining Amount',
                 formatMoney(budgetDetail.remainingAmount),
                 budgetDetail.isExceeded
               )}
 
               {renderInfoRow(
-                'percentage',
+                'Percentage',
                 `${budgetDetail.percentage}%`,
                 budgetDetail.isExceeded
               )}
 
               {renderInfoRow(
-                'isExceeded',
+                'Is Exceeded',
                 budgetDetail.isExceeded ? 'true' : 'false',
                 budgetDetail.isExceeded
               )}
 
               {renderInfoRow(
-                'month',
+                'Month',
                 budgetDetail.month
               )}
 
               {renderInfoRow(
-                'year',
+                'Year',
                 budgetDetail.year
               )}
               <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() =>
-                    navigation.navigate('EditBudgetScreen', {
-                      budget: budget,
-                    })
-                  }
-                >
-                  <Text style={styles.editButtonText}>
-                    Edit Budget
-                  </Text>
+                style={styles.editButton}
+                onPress={() =>
+                  navigation.navigate('EditBudgetScreen', {
+                    budget: budget,
+                  })
+                }
+              >
+                <Text style={styles.editButtonText}>
+                  Edit Budget
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -186,45 +181,6 @@ const BudgetDetailScreen = ({ route, navigation }) => {
 };
 
 export default BudgetDetailScreen;
-
-const budgetDetail = {
-  id: 2,
-  categoryId: 5,
-  limitAmount: 1500000,
-  spentAmount: 1600000,
-  remainingAmount: -100000,
-  percentage: 107,
-  isExceeded: true,
-  month: 8,
-  year: 2026,
-
-  transactions: [
-    {
-      id: 1,
-      title: 'Food',
-      amount: 2500,
-      transactionDate: '2026-08-06',
-    },
-    {
-      id: 2,
-      title: 'Food',
-      amount: 3200,
-      transactionDate: '2026-08-10',
-    },
-    {
-      id: 3,
-      title: 'Food',
-      amount: 1800,
-      transactionDate: '2026-08-12',
-    },
-    {
-      id: 4,
-      title: 'Food',
-      amount: 2700,
-      transactionDate: '2026-08-15',
-    },
-  ],
-};
 
 const styles = StyleSheet.create({
   container: {
