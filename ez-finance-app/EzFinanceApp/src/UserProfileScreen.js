@@ -2,8 +2,19 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserProfileScreen = ({ navigation }) => {
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+
+      navigation.replace('Login');
+    } catch (error) {
+      console.log('Logout error:', error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.headerTitle}>User Profile</Text>
@@ -66,7 +77,7 @@ const UserProfileScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={18} color="#B61E09" />
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
