@@ -1,8 +1,17 @@
-import React, {useState} from 'react';
-import {Alert, View, Text, StyleSheet, TextInput, Pressable, TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import {
+  Alert,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const LoginScreen = ({navigation}) => {
+import Ionicons from 'react-native-vector-icons/Ionicons';
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -10,50 +19,48 @@ const LoginScreen = ({navigation}) => {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch (
-        'http://10.0.2.2:5001/api/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password,
-          }),
-        }
-      );
+      const res = await fetch('http://10.0.2.2:5001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
 
       const result = await res.json();
       console.log(result);
-      if(result.success) {
+      if (result.success) {
         const token = result.data.token;
         console.log(token);
         await AsyncStorage.setItem('token', token);
         navigation.replace('MainTabs');
       } else {
         console.log(result.message);
-        Alert.alert(
-          'Login Failed',
-          result.message
-        );
+        Alert.alert('Login Failed', result.message);
       }
-    } catch(error) {
+    } catch (error) {
       console.log(error);
-      Alert.alert(
-        'Error',
-        'Cannot connect to server'
-      );
+      Alert.alert('Error', 'Cannot connect to server');
     }
-  }
+  };
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword');
+  };
 
   return (
-    <View style={[styles.container,
-      {
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom
-      }
-    ]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
       <View style={styles.form}>
         <Text style={styles.title}>Welcome back!</Text>
         <Text style={styles.subtitle}>Login to your account</Text>
@@ -69,26 +76,29 @@ const LoginScreen = ({navigation}) => {
           onChangeText={setEmail}
         />
       </View>
+
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <Pressable onPress={() => setShowPassword(!showPassword)}>
-          <Text style={styles.eye}>
-            {showPassword ? 'Hide' : 'Show'}
-          </Text>
-        </Pressable>
-        <Pressable>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, styles.passwordInput]}
+            placeholder="Enter your password"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? 'eye-off' : 'eye'}
+              size={22}
+              color="#888"
+            />
+          </TouchableOpacity>
+        </View>
+        <Pressable onPress={handleForgotPassword}>
           <Text style={styles.forgot}>Forgot password?</Text>
         </Pressable>
 
-        {/* will fix when connect to API */}
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
@@ -97,19 +107,24 @@ const LoginScreen = ({navigation}) => {
           <Text style={styles.registerText}>Don't have an account? </Text>
 
           <TouchableOpacity>
-            <Text style={styles.registerLink} onPress={() => navigation.navigate('Register')}>Register</Text>
+            <Text
+              style={styles.registerLink}
+              onPress={() => navigation.navigate('Register')}
+            >
+              Register
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   form: {
     marginTop: 70,
@@ -117,37 +132,48 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   inputGroup: {
-    marginTop: 10
+    marginTop: 10,
   },
   label: {
     fontWeight: 'bold',
     fontSize: 20,
-    marginBottom: 5
+    marginBottom: 5,
   },
   input: {
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
-    height: 46
+    height: 46,
   },
-  eye: {
-    color: 'gray',
-    fontSize: 12,
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    marginBottom: 14,
   },
-
+  passwordInput: {
+    flex: 1,
+    borderWidth: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 14,
+    height: 50,
+  },
   forgot: {
     color: '#4f6df5',
     textAlign: 'right',
     marginTop: 10,
-    fontSize: 12,
+    fontSize: 14,
   },
   loginButton: {
     backgroundColor: '#4f6df5',
@@ -155,28 +181,25 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginTop: 24,
   },
-
   loginText: {
     color: 'white',
     textAlign: 'center',
     fontWeight: 'bold',
   },
-
   registerRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 22,
   },
-
   registerText: {
     fontSize: 12,
     color: 'gray',
   },
-
   registerLink: {
     fontSize: 12,
     color: '#4f6df5',
     fontWeight: 'bold',
   },
-})
+});
+
 export default LoginScreen;
