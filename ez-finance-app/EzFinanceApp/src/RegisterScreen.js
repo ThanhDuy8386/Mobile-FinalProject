@@ -1,9 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, TouchableOpacity } from 'react-native';
+import { Alert, ActivityIndicator, View, Text, StyleSheet, TextInput, Pressable, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const RegisterScreen = ({ navigation }) => {
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();
+
+  const handleRegister = async () => {
+    const trimmedName = fullName.trim();
+    const trimmedEmail = email.trim();
+
+    if (trimmedName.length < 2 || trimmedName.length > 100) {
+      Alert.alert('Invalid name', 'Full name must be between 2 and 100 characters.');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
+      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Invalid password', 'Password must be at least 6 characters.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://10.0.2.2:5001/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: trimmedName,
+          email: trimmedEmail,
+          password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Registration failed');
+      }
+
+      await AsyncStorage.setItem('token', result.data.token);
+      navigation.replace('MainTabs');
+    } catch (error) {
+      Alert.alert('Registration failed', error.message || 'Cannot connect to server');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <View style={[styles.container,
     {
@@ -21,6 +75,8 @@ const RegisterScreen = ({ navigation }) => {
         <TextInput
           style={styles.input}
           placeholder="Enter your full name"
+          value={fullName}
+          onChangeText={setFullName}
         />
       </View>
       <View style={styles.inputGroup}>
@@ -29,6 +85,9 @@ const RegisterScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Enter your email"
           keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
         />
       </View>
       <View style={styles.inputGroup}>
@@ -37,10 +96,15 @@ const RegisterScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Enter your password"
           secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
         />
+        <Pressable onPress={() => setShowPassword(!showPassword)}>
+          <Text style={styles.eye}>{showPassword ? 'Hide' : 'Show'}</Text>
+        </Pressable>
       </View>
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginText}>Register</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={handleRegister} disabled={loading}>
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginText}>Register</Text>}
       </TouchableOpacity>
 
       <View style={styles.registerRow}>

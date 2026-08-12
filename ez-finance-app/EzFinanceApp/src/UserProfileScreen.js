@@ -1,33 +1,98 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Alert, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const API_BASE_URL = 'http://10.0.2.2:5001/api';
+
 const UserProfileScreen = ({ navigation }) => {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const loadProfile = useCallback(async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Unable to load profile');
+      }
+
+      setProfile(result.data);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [loadProfile]),
+  );
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');
+      const rootNavigation = navigation.getParent()?.getParent();
 
-      navigation.replace('Login');
-    } catch (error) {
-      console.log('Logout error:', error);
+      if (rootNavigation) {
+        rootNavigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
+      } else {
+        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+      }
+    } catch (logoutError) {
+      Alert.alert('Logout failed', logoutError.message);
     }
+  };
+
+  const confirmLogout = () => {
+    Alert.alert('Logout', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Logout', style: 'destructive', onPress: handleLogout },
+    ]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.headerTitle}>User Profile</Text>
 
-      <View style={styles.profileCard}>
-        <View style={styles.avatar}>
-          <Ionicons name="person" size={28} color="#2E75E7" />
+      {loading && !profile ? (
+        <ActivityIndicator size="large" color="#1569FF" style={styles.loader} />
+      ) : error && !profile ? (
+        <View style={styles.messageBox}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={loadProfile} style={styles.retryButton}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.profileText}>
-          <Text style={styles.profileName}>Demo User</Text>
-          <Text style={styles.profileEmail}>demo@ezfinance.com</Text>
+      ) : (
+        <View style={styles.profileCard}>
+          <View style={styles.avatar}>
+            <Ionicons name="person" size={28} color="#2E75E7" />
+          </View>
+          <View style={styles.profileText}>
+            <Text style={styles.profileName}>{profile?.fullName}</Text>
+            <Text style={styles.profileEmail}>{profile?.email}</Text>
+          </View>
         </View>
-      </View>
+      )}
 
       <View style={styles.menuCard}>
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('CategoryList')}>
@@ -54,7 +119,7 @@ const UserProfileScreen = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate('EditProfile')}>
+          onPress={() => navigation.navigate('EditProfile', { profile })}>
           <Ionicons
             name="create-outline"
             size={20}
@@ -77,7 +142,7 @@ const UserProfileScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <TouchableOpacity style={styles.logoutButton} onPress={confirmLogout}>
         <Ionicons name="log-out-outline" size={18} color="#B61E09" />
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
@@ -165,5 +230,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     marginLeft: 8,
+  },
+  loader: {
+    marginVertical: 32,
+  },
+  messageBox: {
+    borderWidth: 1,
+    borderColor: '#f0b8b8',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  errorText: {
+    color: '#B61E09',
+    marginBottom: 12,
+  },
+  retryButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#1569FF',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  retryText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

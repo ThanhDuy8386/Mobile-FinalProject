@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -9,29 +9,9 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const categoryOptions = [
-    {
-        label: 'Food',
-        value: 1,
-    },
-    {
-        label: 'Transport',
-        value: 2,
-    },
-    {
-        label: 'Shopping',
-        value: 3,
-    },
-    {
-        label: 'Salary',
-        value: 4,
-    },
-    {
-        label: 'Other',
-        value: 5,
-    },
-];
+const API_BASE_URL = 'http://10.0.2.2:5001/api';
 
 const monthOptions = [
     {
@@ -84,11 +64,7 @@ const monthOptions = [
     },
 ];
 
-const yearOptions = [
-    2024,
-    2025,
-    2026,
-];
+const yearOptions = Array.from({ length: 7 }, (_, index) => new Date().getFullYear() - index);
 
 const sortByOptions = [
     {
@@ -125,6 +101,7 @@ const TransactionFilterScreen = ({ navigation }) => {
     const [keyword, setKeyword] = useState('');
 
     const [categoryId, setCategoryId] = useState(null);
+    const [categories, setCategories] = useState([]);
     const [month, setMonth] = useState(null);
     const [year, setYear] = useState(null);
 
@@ -147,6 +124,25 @@ const TransactionFilterScreen = ({ navigation }) => {
     const [sortByOpen, setSortByOpen] = useState(false);
     const [sortOrderOpen, setSortOrderOpen] = useState(false);
 
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                const token = await AsyncStorage.getItem('token');
+                if (!token) return;
+                const query = activeFilter === 'ALL' ? '' : `?type=${activeFilter}`;
+                const response = await fetch(`${API_BASE_URL}/categories${query}`, {
+                    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+                });
+                const result = await response.json();
+                if (response.ok && result.success) setCategories(result.data || []);
+            } catch (requestError) {
+                // The list screen can still be used without the optional category picker.
+            }
+        };
+        loadCategories();
+        setCategoryId(null);
+    }, [activeFilter]);
+
     const closeAllDropdowns = () => {
         setCategoryOpen(false);
         setMonthOpen(false);
@@ -156,11 +152,11 @@ const TransactionFilterScreen = ({ navigation }) => {
     };
 
     const formatDate = date => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const dateYear = date.getFullYear();
+        const dateMonth = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
 
-        return `${year}-${month}-${day}`;
+        return `${dateYear}-${dateMonth}-${day}`;
     };
 
     const handleStartDateChange = (event, date) => {
@@ -194,13 +190,11 @@ const TransactionFilterScreen = ({ navigation }) => {
             sortOrder,
         };
 
-        console.log('Transaction filters:', filters);
-
-        navigation.goBack();
+        navigation.navigate('TransactionList', { filters });
     };
 
-    const selectedCategory = categoryOptions.find(
-        option => option.value === categoryId,
+    const selectedCategory = categories.find(
+        option => option.id === categoryId,
     );
 
     const selectedMonth = monthOptions.find(
@@ -297,7 +291,7 @@ const TransactionFilterScreen = ({ navigation }) => {
                     }}
                 >
                     <Text style={styles.dropdownText}>
-                        {selectedCategory?.label || 'All Categories'}
+                        {selectedCategory?.name || 'All Categories'}
                     </Text>
 
                     <Ionicons
@@ -326,17 +320,17 @@ const TransactionFilterScreen = ({ navigation }) => {
                             </Text>
                         </TouchableOpacity>
 
-                        {categoryOptions.map(option => (
+                        {categories.map(option => (
                             <TouchableOpacity
-                                key={option.value}
+                                key={option.id}
                                 style={styles.dropdownItem}
                                 onPress={() => {
-                                    setCategoryId(option.value);
+                                    setCategoryId(option.id);
                                     setCategoryOpen(false);
                                 }}
                             >
                                 <Text style={styles.dropdownItemText}>
-                                    {option.label}
+                                    {option.name}
                                 </Text>
                             </TouchableOpacity>
                         ))}
@@ -667,19 +661,16 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-
     contentContainer: {
         padding: 20,
         paddingBottom: 40,
     },
-
     card: {
         borderWidth: 1,
         borderColor: '#c0c0c0',
         borderRadius: 12,
         padding: 12,
     },
-
     label: {
         fontSize: 15,
         marginBottom: 6,
@@ -687,13 +678,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#222',
     },
-
     filterRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 4,
     },
-
     filterPill: {
         borderWidth: 1,
         borderColor: '#ccc',
@@ -702,24 +691,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         marginRight: 8,
     },
-
     filterPillActive: {
         backgroundColor: '#065EE3',
         borderColor: '#065EE3',
     },
-
     filterText: {
         color: '#333',
         fontWeight: '600',
         fontSize: 13,
     },
-
     filterTextActive: {
         color: '#fff',
         fontWeight: '600',
         fontSize: 13,
     },
-
     dropdown: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -730,12 +715,10 @@ const styles = StyleSheet.create({
         padding: 14,
         backgroundColor: '#fff',
     },
-
     dropdownText: {
         fontSize: 15,
         color: '#333',
     },
-
     dropdownList: {
         borderWidth: 1,
         borderColor: '#ccc',
@@ -744,18 +727,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         overflow: 'hidden',
     },
-
     dropdownItem: {
         padding: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
-
     dropdownItemText: {
         fontSize: 14,
         color: '#333',
     },
-
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -765,14 +745,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         height: 48,
     },
-
     searchInput: {
         flex: 1,
         marginLeft: 8,
         fontSize: 15,
         color: '#333',
     },
-
     applyButton: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -782,7 +760,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         marginTop: 24,
     },
-
     applyFilterText: {
         color: '#fff',
         fontWeight: 'bold',

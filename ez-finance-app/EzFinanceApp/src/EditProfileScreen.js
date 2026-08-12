@@ -1,15 +1,60 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const EditProfileScreen = ({ navigation }) => {
-  const [fullName, setFullName] = useState('Demo User'); // will fix when connect to API
-  const [email, setEmail] = useState('demo@ezfinance.com'); // will fix when connect to API
+const API_BASE_URL = 'http://10.0.2.2:5001/api';
+
+const EditProfileScreen = ({ navigation, route }) => {
+  const [fullName, setFullName] = useState(route.params?.profile?.fullName || '');
+  const [email, setEmail] = useState(route.params?.profile?.email || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    const trimmedName = fullName.trim();
+    const trimmedEmail = email.trim();
+
+    if (trimmedName.length < 2 || trimmedName.length > 100) {
+      Alert.alert('Invalid name', 'Full name must be between 2 and 100 characters.');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(trimmedEmail)) {
+      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ fullName: trimmedName, email: trimmedEmail }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Unable to update profile');
+      }
+
+      navigation.goBack();
+    } catch (requestError) {
+      Alert.alert('Update failed', requestError.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -29,8 +74,8 @@ const EditProfileScreen = ({ navigation }) => {
           keyboardType="email-address"
           style={styles.input}
         />
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.saveText}>Save</Text>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={saving}>
+          {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>Save</Text>}
         </TouchableOpacity>
       </View>
     </View>

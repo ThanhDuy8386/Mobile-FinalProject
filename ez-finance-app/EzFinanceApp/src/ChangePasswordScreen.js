@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -7,12 +9,59 @@ import {
   TextInput,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_BASE_URL = 'http://10.0.2.2:5001/api';
 
 const ChangePasswordScreen = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      Alert.alert('Missing password', 'Enter both your current and new password.');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Alert.alert('Invalid password', 'New password must be at least 6 characters.');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      Alert.alert('Invalid password', 'New password must differ from current password.');
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/users/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Unable to change password');
+      }
+
+      Alert.alert('Success', 'Password changed successfully.', [
+        { text: 'OK', onPress: () => navigation.goBack() },
+      ]);
+    } catch (requestError) {
+      Alert.alert('Update failed', requestError.message);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -53,8 +102,8 @@ const ChangePasswordScreen = ({ navigation }) => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.updateButton}>
-          <Text style={styles.updateText}>Update</Text>
+        <TouchableOpacity style={styles.updateButton} onPress={handleChangePassword} disabled={updating}>
+          {updating ? <ActivityIndicator color="#fff" /> : <Text style={styles.updateText}>Update</Text>}
         </TouchableOpacity>
       </View>
     </View>
