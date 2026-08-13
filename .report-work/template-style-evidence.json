@@ -1,0 +1,168 @@
+{
+  "input": "C:\\mobi-dev\\mobi-project\\Project-1_Doc_Final.docx",
+  "fonts_by_char_count": {},
+  "direct_run_formatting_runs": 338,
+  "direct_paragraph_formatting_paragraphs": 620,
+  "heading_like_paragraphs_not_heading_style": [
+    {
+      "para_index": 1,
+      "text": "EASTERN INTERNATIONAL UNIVERSITY",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 2,
+      "text": "SCHOOL OF COMPUTING AND INFORMATION TECHNOLOGY",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 3,
+      "text": "DEPARTMENT OF SOFTWARE ENGINEERING",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 8,
+      "text": "PROJECT 1 REPORT",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 13,
+      "text": "\t\t\t\t\t\t\t\t\tStudent(s)",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 19,
+      "text": "Supervisor(s)",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 25,
+      "text": "Ho Chi Minh City, August 2025",
+      "style": "No Spacing"
+    },
+    {
+      "para_index": 184,
+      "text": "Table 1: Description of Question table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 188,
+      "text": "Table 2: Description of StudentMetaData table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 192,
+      "text": "Table 3: Description of Test table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 195,
+      "text": "Table 4: Description of TestSubmission table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 199,
+      "text": "Table 5: Description of TestSubmissionDetail table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 203,
+      "text": "Table 6: Description of TypeSkill table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 207,
+      "text": "Table 7: Description of  User table in database",
+      "style": "Caption"
+    },
+    {
+      "para_index": 409,
+      "text": "Knowledge Acquired",
+      "style": "Normal"
+    },
+    {
+      "para_index": 413,
+      "text": "Product Outcome",
+      "style": "Normal"
+    },
+    {
+      "para_index": 415,
+      "text": "Skills Development",
+      "style": "Normal"
+    },
+    {
+      "para_index": 434,
+      "text": "Term",
+      "style": "Normal"
+    },
+    {
+      "para_index": 435,
+      "text": "Meaning",
+      "style": "Normal"
+    },
+    {
+      "para_index": 470,
+      "text": "Field Name",
+      "style": "Normal (Web)"
+    }
+  ],
+  "examples": {
+    "direct_run_formatting": [
+      {
+        "para_index": 1,
+        "run_text": "EASTERN INTERNATIONAL UNIVERSITY",
+        "style": "No Spacing"
+      },
+      {
+        "para_index": 2,
+        "run_text": "SCHOOL OF COMPUTING AND INFORMATION TECHNOLOGY",
+        "style": "No Spacing"
+      },
+      {
+        "para_index": 3,
+        "run_text": "DEPARTMENT OF ",
+        "style": "No Spacing"
+      },
+      {
+        "para_index": 3,
+        "run_text": "SOFTWARE ENGINEERING",
+        "style": "No Spacing"
+      },
+      {
+        "para_index": 8,
+        "run_text": "PROJECT ",
+        "style": "No Spacing"
+      }
+    ],
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 3,
+        "text": "DEPARTMENT OF SOFTWARE ENGINEERING",
+        "style": "No Spacing"
+      },
+      {
+        "para_index": 9,
+        "text": "",
+        "style": "Normal"
+      },
+      {
+        "para_index": 23,
+        "text": "",
+        "style": "Normal"
+      },
+      {
+        "para_index": 24,
+        "text": "",
+        "style": "Normal"
+      },
+      {
+        "para_index": 26,
+        "text": "ABSTRACT",
+        "style": "Title"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}
